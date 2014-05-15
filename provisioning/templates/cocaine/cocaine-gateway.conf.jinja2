@@ -1,0 +1,61 @@
+{
+    "version": 2,
+    "paths": {
+        "plugins": "/usr/lib/cocaine",
+        "runtime": "/var/run/cocaine",
+        "spool": "/var/spool/cocaine"
+    },
+    "network": {
+            "group": "224.168.2.9",
+            "gateway": {
+                 "type": "adhoc"
+            }
+        },
+    "services": {
+        "logging": {
+            "type": "logging"
+        },
+        "storage": {
+            "type": "elliptics",
+            "args": {
+                "backend": "core"
+            }
+        },
+        "node": {
+            "type": "node",
+            "args": {
+                "runlist": "default"
+            }
+        }
+    },
+    "storages": {
+        "core": {
+            "type": "elliptics",
+            "args": {
+                "nodes": [
+{% for host in groups['storage'] %}
+  "{{ hostvars[host]['ansible_all_ipv4_addresses'][1] }}:1025:2"
+  {% if not loop.last %},{% endif %}
+{% endfor %}
+                ],
+                "groups": [1]
+            }
+        },
+        "cache": {
+            "type": "files",
+            "args": {
+                "path": "/var/cache/cocaine"
+            },
+            "verbosity": 2
+        }
+    },
+    "loggers": {
+        "core": {
+            "type": "syslog",
+            "args": {
+                "identity": "cocaine",
+                "verbosity": "info"
+            }
+        }
+    }
+}

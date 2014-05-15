@@ -1,0 +1,22 @@
+{
+    "endpoints": [
+        "0.0.0.0:8080"
+    ],
+    "daemon": {
+        "monitor-port": 20000
+    },
+    "backlog": 2048,
+    "threads": 2,
+    "application": {
+        "locators": [
+{% for host in groups['cocaine-gateway'] %}
+  "{{ hostvars[host]['ansible_all_ipv4_addresses'][1] }}:10053"
+  {% if not loop.last %},{% endif %}
+{% endfor %}
+        ],
+        "logging_prefix": "cocaine-proxy-{{ ansible_hostname }}",
+        "service_pool": 10,
+        "reconnect_timeout": 180,
+        "request_timeout": 5
+    }
+}

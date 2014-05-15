@@ -1,0 +1,33 @@
+defaults:
+  memory: 1024
+  net_auto: true
+  tld: .local
+  ansible_groups: []
+
+nodes:
+  elliptics:
+    ip: 192.168.50.201
+    ansible_groups:
+      - storage
+  cocaine01:
+    ip: 192.168.50.202
+    ansible_groups:
+      - cocaine-base
+      - cocaine-runtime
+      - cocaine-tools
+  cocaine02:
+    ip: 192.168.50.203
+    ansible_groups:
+      - cocaine-base
+      - cocaine-runtime
+      - cocaine-tools
+  front:
+    ip: 192.168.50.204
+    ansible_groups:
+      - cocaine-base
+      - cocaine-gateway
+      - cocaine-proxy
+  client:
+    ip: 192.168.50.205
+    ansible_groups:
+      - cocaine-tools

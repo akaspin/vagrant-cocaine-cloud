@@ -1,0 +1,139 @@
+---
+- hosts: all
+  tasks:
+    - name: purge firewalls
+      apt: name={{ item }} state=absent purge=yes
+      with_items:
+        - apparmor
+        - apparmor-utils
+        - ufw
+    - name: upgrade system
+      apt: update_cache=yes upgrade=full
+    - name: install repo keys
+      apt_key: url={{ item }}
+      with_items:
+        - 'http://repo.reverbrain.com/REVERBRAIN.GPG'
+        - 'http://keyserver.ubuntu.com/pks/lookup?op=get&fingerprint=on&search=0x36A1D7869245C8950F966E92D8576A8BA88D21E9'
+    - name: install repos
+      apt_repository: repo='{{ item }}'
+      with_items:
+        - 'deb https://get.docker.io/ubuntu docker main'
+        - 'deb http://repo.reverbrain.com/precise/ current/amd64/'
+        - 'deb http://repo.reverbrain.com/precise/ current/all/'
+    - name: install packages
+      apt: name={{ item }} state=latest update_cache=yes
+      with_items:
+        - curl
+        - htop
+        - vim-nox
+        - iperf
+        - avahi-utils
+    - name: setup multicast
+      copy: src=files/common/multicast dest=/etc/network/if-up.d/multicast mode=755
+      notify:
+        - restart eth1
+  handlers:
+     - name: restart eth1
+       shell: ifdown eth1; ifup eth1
+
+- hosts: storage
+  tasks:
+    - name: install elliptics
+      apt: name={{ item }} state=latest
+      with_items:
+        - elliptics
+        - elliptics-client
+      notify:
+        - restart elliptics
+    - name: elliptics user
+      user: name=elliptics group=adm system=yes createhome=no shell=/bin/false
+    - name: elliptics dirs
+      file: path={{ item }} state=directory owner=elliptics group=adm
+      with_items:
+        - /opt/elliptics/history.1
+        - /opt/elliptics/eblob.1
+        - /opt/elliptics/eblob.1/data
+        - /etc/elliptics
+    - name: elliptics config
+      copy: src=files/elliptics/ioserv.json dest=/etc/elliptics/ioserv.json
+      notify:
+        - restart elliptics
+    - name: elliptics init
+      copy: src=files/elliptics/init dest=/etc/init.d/elliptics mode=755
+      notify:
+        - restart elliptics
+  handlers:
+    - name: restart elliptics
+      service: name=elliptics enabled=yes state=restarted
+
+- hosts: cocaine-base
+  tasks:
+    - name: Install cocaine runtime
+      apt: name={{ item }} state=latest
+      with_items:
+        - cocaine-runtime
+        - libcocaine-core2
+        - libcocaine-plugin-docker2
+        - libcocaine-plugin-elliptics
+        - elliptics-client
+      notify:
+        - restart cocaine
+  handlers:
+    - name: restart cocaine
+      service: name=cocaine-runtime enabled=yes state=restarted
+
+- hosts: cocaine-runtime
+  tasks:
+    - name: cocaine runtime config
+      template: src=templates/cocaine/cocaine-cloud.conf.jinja2
+                dest=/etc/cocaine/cocaine-default.conf
+      notify:
+        - restart cocaine
+  handlers:
+    - name: restart cocaine
+      service: name=cocaine-runtime enabled=yes state=restarted
+
+- hosts: cocaine-tools
+  tasks:
+    - name: install cocaine-tools dependencies
+      apt: name={{ item }} state=latest
+      with_items:
+        - build-essential
+        - python-dev
+        - msgpack-python
+        - python-pip
+    - name: install cocaine-tools
+      pip: name=cocaine-tools
+
+- hosts: cocaine-gateway
+  tasks:
+    - name: cocaine gateway config
+      template: src=templates/cocaine/cocaine-gateway.conf.jinja2
+                dest=/etc/cocaine/cocaine-default.conf
+      notify:
+        - restart cocaine
+  handlers:
+    - name: restart cocaine
+      service: name=cocaine-runtime enabled=yes state=restarted
+
+- hosts: cocaine-proxy
+  tasks:
+    - name: install cocaine-native-proxy
+      apt: name={{ item }} state=latest
+      with_items:
+        - cocaine-native-proxy
+      notify:
+        - restart cocaine-native-proxy
+    - name: cocaine gateway config
+      template: src=templates/cocaine/cocaine-native-proxy.conf.jinja2
+                dest=/etc/cocaine-native-proxy/default.conf
+      notify:
+        - restart cocaine-native-proxy
+
+  handlers:
+    - name: restart cocaine-native-proxy
+      service: name=cocaine-native-proxy enabled=yes state=restarted
+
+
+
+
