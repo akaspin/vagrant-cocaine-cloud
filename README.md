@@ -10,7 +10,7 @@
 
     vagrant up
 
-Be calm - it's take time.
+Be calm - it can take time.
 
 ## Boxes
 
