@@ -2,6 +2,7 @@ defaults:
   memory: 1024
   net_auto: true
   tld: .local
+  cocaine_multicast: 224.168.2.9
   ansible_groups: []
 
 nodes:
@@ -15,12 +16,14 @@ nodes:
       - cocaine-base
       - cocaine-runtime
       - cocaine-tools
+      - docker-runtime
   cocaine02:
     ip: 192.168.50.203
     ansible_groups:
       - cocaine-base
       - cocaine-runtime
       - cocaine-tools
+      - docker-runtime
   front:
     ip: 192.168.50.204
     ansible_groups:
@@ -31,3 +34,4 @@ nodes:
     ip: 192.168.50.205
     ansible_groups:
       - cocaine-tools
+      - docker-runtime

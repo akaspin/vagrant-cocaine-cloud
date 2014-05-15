@@ -42,6 +42,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           ansible.playbook = 'provisioning/playbook.yaml'
           ansible.sudo = true
           ansible.limit = 'all'
+          ansible.extra_vars = {
+              cocaine_multicast: props['cocaine_multicast'],
+              nginx: {
+                  port: 8008,
+                  workers: 4
+              }
+          }
         end
       end
     end
