@@ -7,8 +7,8 @@
         - apparmor
         - apparmor-utils
         - ufw
-    - name: upgrade system
-      apt: update_cache=yes upgrade=full
+#    - name: upgrade system
+#      apt: update_cache=yes upgrade=full
     - name: install repo keys
       apt_key: url={{ item }}
       with_items:
@@ -20,7 +20,7 @@
         - 'deb https://get.docker.io/ubuntu docker main'
         - 'deb http://repo.reverbrain.com/precise/ current/amd64/'
         - 'deb http://repo.reverbrain.com/precise/ current/all/'
-    - name: install packages
+    - name: install basic packages
       apt: name={{ item }} state=latest update_cache=yes
       with_items:
         - curl

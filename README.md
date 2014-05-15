@@ -8,9 +8,9 @@
 
 ## Usage
 
-By default, all provision can be done by following command:
-
     vagrant up
+
+Be calm - it's take time.
 
 ## Boxes
 
@@ -22,7 +22,7 @@ Elliptics as storage.
 installed on both boxes
 * `front` runs `cocaine-runtime` in gateway mode and `cocaine-native-proxy`
 on port `8080`.
-* `client` holds only `cocaine-tools`. Use for run isolated scripts.
+* `client` holds only `cocaine-tools`. Use for isolated scripts.
 
 ## Cluster control
 
@@ -30,4 +30,5 @@ To control cluster use `cluster.yaml`.
 
 ## Network
 
-For communication
+All `cocaine-runtime` nodes uses multicast for discovery. Also all nodes use
+`mDNS` for dynamic host resolution.
