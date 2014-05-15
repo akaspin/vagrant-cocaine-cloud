@@ -55,7 +55,7 @@
         - /opt/elliptics/eblob.1/data
         - /etc/elliptics
     - name: elliptics config
-      copy: src=files/elliptics/ioserv.json dest=/etc/elliptics/ioserv.json
+      template: src=templates/elliptics/ioserv.json.jinja2 dest=/etc/elliptics/ioserv.json
       notify:
         - restart elliptics
     - name: elliptics init
@@ -129,11 +129,19 @@
                 dest=/etc/cocaine-native-proxy/default.conf
       notify:
         - restart cocaine-native-proxy
-
   handlers:
     - name: restart cocaine-native-proxy
       service: name=cocaine-native-proxy enabled=yes state=restarted
 
-
-
+- hosts: docker-runtime
+  tasks:
+    - name: install docker
+      apt: name={{ item }} state=latest
+      with_items:
+        - lxc-docker
+      notify:
+        - restart docker
+  handlers:
+    - name: restart docker
+      service: name=docker enabled=yes state=restarted
 

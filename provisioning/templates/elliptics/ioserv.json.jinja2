@@ -11,7 +11,7 @@
 		],
 		"address": [
 			"localhost:1025:2-0",
-			"192.168.50.201:1025:2-1"
+			"{{ ansible_all_ipv4_addresses[1] }}:1025:2-1"
 		],
 		"wait_timeout": 60,
 		"check_timeout": 60,

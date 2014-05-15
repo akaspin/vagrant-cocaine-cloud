@@ -35,3 +35,8 @@ nodes:
     ansible_groups:
       - cocaine-tools
       - docker-runtime
+  registry:
+    ip: 192.168.50.206
+    ansible_groups:
+      - docker-runtime
+
